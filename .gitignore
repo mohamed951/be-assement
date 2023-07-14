@@ -1,0 +1,10 @@
+### IntelliJ
+**/.idea
+**/.mvn
+**/*.iml
+.DS_Store
+**/*.DS_Store
+### Maven
+**/target
+### JAVA
+**/out
