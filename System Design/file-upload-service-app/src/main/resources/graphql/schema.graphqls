@@ -1,0 +1,41 @@
+type Query {
+    files : [File]
+    fileById(id: ID!) : File
+}
+
+type File {
+    id: ID!
+    name: String!
+    parent: Item!
+    path: String!
+}
+
+type Item {
+    id: ID!
+    name: String!
+    type: String!
+    parent: Item!
+    path: String!
+}
+
+# Query Sample
+#{
+#    fileById(id: 5){
+#        id
+#        name
+#        path
+#        parent{
+#            id
+#            name
+#            type
+#            path
+#            parent{
+#                id
+#                name
+#                type
+#                path
+#
+#            }
+#        }
+#    }
+#}

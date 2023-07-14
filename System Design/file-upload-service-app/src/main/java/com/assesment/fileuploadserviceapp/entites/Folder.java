@@ -14,4 +14,14 @@ public class Folder extends Item {
 
     @OneToMany(mappedBy = "parent")
     private List<File> files;
+
+    @Override
+    public String getType() {
+        return Folder.class.getSimpleName();
+    }
+
+    @Override
+    public String getPath() {
+        return getParent().getPath() + "/" + getName();
+    }
 }

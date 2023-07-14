@@ -9,6 +9,7 @@ import lombok.Data;
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "type", discriminatorType = DiscriminatorType.STRING)
 public abstract class Item {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -24,4 +25,7 @@ public abstract class Item {
     @JoinColumn(name = "parent_id")
     private Item parent;
 
+    public abstract String getType();
+
+    public abstract String getPath();
 }

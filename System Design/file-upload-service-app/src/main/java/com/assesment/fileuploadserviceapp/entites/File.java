@@ -9,4 +9,13 @@ import lombok.Data;
 @DiscriminatorValue("File")
 public class File extends Item {
 
+    @Override
+    public String getType() {
+        return File.class.getSimpleName();
+    }
+
+    @Override
+    public String getPath() {
+        return getParent().getPath() + "/" + getName();
+    }
 }

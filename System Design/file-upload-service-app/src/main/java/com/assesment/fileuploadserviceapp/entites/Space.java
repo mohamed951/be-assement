@@ -17,4 +17,14 @@ public class Space extends Item {
 
     @OneToMany(mappedBy = "parent")
     private List<File> files;
+
+    @Override
+    public String getType() {
+        return Space.class.getSimpleName();
+    }
+
+    @Override
+    public String getPath() {
+        return "/" + getName();
+    }
 }
