@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dataset>
+    <permission_group
+            id="101"
+            name="ADMIN"
+    />
+
+    <permission
+            id="101"
+            user_email="viewer@test.com"
+            permission_level="VIEW"
+            group_id="101"
+    />
+
+    <permission
+            id="102"
+            user_email="admin@test.com"
+            permission_level="EDIT"
+            group_id="101"
+    />
+
+    <item
+            id="101"
+            type="Space"
+            name="spaceX"
+            permission_group_id="101"
+
+    />
+
+
+</dataset>
