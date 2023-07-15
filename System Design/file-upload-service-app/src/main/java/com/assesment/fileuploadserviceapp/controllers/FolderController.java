@@ -1,5 +1,6 @@
 package com.assesment.fileuploadserviceapp.controllers;
 
+import com.assesment.fileuploadserviceapp.entites.File;
 import com.assesment.fileuploadserviceapp.service.FileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +19,7 @@ public class FolderController {
     public ResponseEntity<String> uploadFileToFolder(@PathVariable Long folderId, @RequestParam("file") MultipartFile file, @RequestHeader("Authorization") String userMail)
             throws IOException {
         String fileName = file.getOriginalFilename();
-        fileService.createFileToFolder(folderId, fileName, file.getBytes(), userMail);
-        return ResponseEntity.ok("File uploaded successfully: " + fileName);
+        File savedFile = fileService.createFileToFolder(folderId, fileName, file.getBytes(), userMail);
+        return ResponseEntity.ok("File uploaded successfully: name %s with id %s".formatted(fileName, savedFile));
     }
 }

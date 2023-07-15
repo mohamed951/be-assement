@@ -79,4 +79,17 @@ public class FileService {
         return fileDataRepository.findByItem(file)
                 .orElseThrow(() -> new FileNotFoundException("File not found with ID: " + fileId));
     }
+
+    public File getFile(Long fileId, String userMail) throws FileNotFoundException {
+        File file = fileRepository.findById(fileId).orElseThrow();
+        PermissionGroup permissionGroup = file.getPermissionGroup();
+
+        boolean isAuthorized = permissionRepository.existsByPermissionGroup_IdAndUserEmailAndPermissionLevelIn(permissionGroup.getId(), userMail,
+                List.of(PermissionLevel.EDIT, PermissionLevel.VIEW));
+
+        if (!isAuthorized) {
+            throw new ForbiddenException("Not authorized to access this resource");
+        }
+        return file;
+    }
 }
