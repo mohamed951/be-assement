@@ -6,6 +6,9 @@ import com.assesment.fileuploadserviceapp.entites.Space;
 
 public class FolderBuilder {
 
+    private FolderBuilder() {
+    }
+
     public static Folder constructFolder(String folderName, Space space, PermissionGroup permissionGroup) {
         Folder folder = new Folder();
         folder.setName(folderName);

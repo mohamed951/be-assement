@@ -7,6 +7,9 @@ import com.assesment.fileuploadserviceapp.entites.Space;
 
 public class FileBuilder {
 
+    private FileBuilder() {
+    }
+
     public static File constructFile(String fileName, Space space, PermissionGroup permissionGroup) {
         File file = new File();
         file.setName(fileName);

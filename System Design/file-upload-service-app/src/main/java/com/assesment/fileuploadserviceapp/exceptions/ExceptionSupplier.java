@@ -4,7 +4,14 @@ import java.util.function.Supplier;
 
 public class ExceptionSupplier {
 
+    private ExceptionSupplier() {
+    }
+
     public static Supplier<NotFoundException> itemNotFoundException(Long id) {
-        return () -> new NotFoundException("Item not found with ID: " + id);
+        return () -> new NotFoundException("Item not found with ID=" + id);
+    }
+
+    public static Supplier<NotFoundException> defaultGroupNotFound(String name) {
+        return () -> new NotFoundException("Default group with name= %s not Found".formatted(name));
     }
 }

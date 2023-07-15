@@ -2,12 +2,12 @@ package com.assesment.fileuploadserviceapp.controllers;
 
 import com.assesment.fileuploadserviceapp.entites.File;
 import com.assesment.fileuploadserviceapp.entites.FileData;
-import com.assesment.fileuploadserviceapp.repositories.FileRepository;
 import com.assesment.fileuploadserviceapp.service.FileService;
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,19 +20,15 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
 @RestController
+@AllArgsConstructor
 public class FileController {
 
-    @Autowired
     private FileService fileService;
 
-    @Autowired
-    private FileRepository fileRepository;
-
-    @Autowired
     private HttpServletRequest request;
 
     @GetMapping("/files/{fileId}")
-    public ResponseEntity<byte[]> downloadFile(@PathVariable Long fileId, @RequestHeader("Authorization") String userMail) throws FileNotFoundException {
+    public ResponseEntity<byte[]> downloadFile(@PathVariable Long fileId, @RequestHeader(HttpHeaders.AUTHORIZATION) String userMail) throws FileNotFoundException {
         FileData fileData = fileService.getFileData(fileId, userMail);
         byte[] fileBytes = fileData.getBinaryData();
 
@@ -43,8 +39,8 @@ public class FileController {
     }
 
     @QueryMapping
-    public File fileById(@Argument Long id) throws FileNotFoundException {
-        String userMail = request.getHeader("Authorization");
+    public File fileById(@Argument Long id) {
+        String userMail = request.getHeader(HttpHeaders.AUTHORIZATION);
         return fileService.getFile(id, userMail);
     }
 }
