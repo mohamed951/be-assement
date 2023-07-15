@@ -11,7 +11,7 @@ public class ExceptionSupplier {
         return () -> new NotFoundException("Item not found with ID=" + id);
     }
 
-    public static Supplier<NotFoundException> defaultGroupNotFound(String name) {
+    public static Supplier<NotFoundException> defaultGroupNotFoundException(String name) {
         return () -> new NotFoundException("Default group with name= %s not Found".formatted(name));
     }
 }

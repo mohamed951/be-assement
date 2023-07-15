@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-import static com.assesment.fileuploadserviceapp.exceptions.ExceptionSupplier.defaultGroupNotFound;
+import static com.assesment.fileuploadserviceapp.exceptions.ExceptionSupplier.defaultGroupNotFoundException;
 
 @Service
 @AllArgsConstructor
@@ -36,7 +36,7 @@ public class SpaceServiceImpl implements SpaceService {
     private PermissionGroup getDefaultPermissionGroup() {
         final String defaultGroupName = "ADMIN";
         return permissionGroupRepository.findByName(defaultGroupName).orElseThrow(
-                defaultGroupNotFound(defaultGroupName)
+                defaultGroupNotFoundException(defaultGroupName)
         );
     }
 }
