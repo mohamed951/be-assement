@@ -1,5 +1,6 @@
 package com.assesment.fileuploadserviceapp.controllers;
 
+import com.assesment.fileuploadserviceapp.entites.File;
 import com.assesment.fileuploadserviceapp.entites.Folder;
 import com.assesment.fileuploadserviceapp.entites.Space;
 import com.assesment.fileuploadserviceapp.service.FileService;
@@ -40,7 +41,7 @@ public class SpaceController {
     public ResponseEntity<String> uploadFileToSpace(@PathVariable Long spaceId, @RequestParam("file") MultipartFile file, @RequestHeader("Authorization") String userMail)
             throws IOException {
         String fileName = file.getOriginalFilename();
-        fileService.createFileToSpace(spaceId, fileName, file.getBytes(), userMail);
-        return ResponseEntity.ok("File uploaded successfully: " + fileName);
+        File savedFile = fileService.createFileToSpace(spaceId, fileName, file.getBytes(), userMail);
+        return ResponseEntity.ok("File with id: %s name: %s uploaded".formatted(savedFile.getId(), savedFile.getName()));
     }
 }

@@ -1,23 +1,26 @@
 package com.assesment.fileuploadserviceapp.service;
 
 import com.assesment.fileuploadserviceapp.entites.*;
-import com.assesment.fileuploadserviceapp.exceptions.ForbiddenException;
 import com.assesment.fileuploadserviceapp.lenum.PermissionLevel;
-import com.assesment.fileuploadserviceapp.repositories.*;
+import com.assesment.fileuploadserviceapp.repositories.FileDataRepository;
+import com.assesment.fileuploadserviceapp.repositories.FileRepository;
+import com.assesment.fileuploadserviceapp.repositories.FolderRepository;
+import com.assesment.fileuploadserviceapp.repositories.SpaceRepository;
+import com.assesment.fileuploadserviceapp.util.FileBuilder;
+import com.assesment.fileuploadserviceapp.util.FileDataBuilder;
+import com.assesment.fileuploadserviceapp.validation.PermissionValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.FileNotFoundException;
 import java.util.List;
+
+import static com.assesment.fileuploadserviceapp.exceptions.ExceptionSupplier.itemNotFoundException;
 
 @Service
 public class FileService {
 
     @Autowired
     private SpaceRepository spaceRepository;
-
-    @Autowired
-    private PermissionRepository permissionRepository;
 
     @Autowired
     private FolderRepository folderRepository;
@@ -28,68 +31,52 @@ public class FileService {
     @Autowired
     private FileDataRepository fileDataRepository;
 
+    @Autowired
+    private PermissionValidator permissionValidator;
+
     public File createFileToFolder(Long folderId, String fileName, byte[] bytes, String userMail) {
-        Folder folder = folderRepository.findById(folderId).orElseThrow();
-        PermissionGroup permissionGroup = folder.getPermissionGroup();
-        boolean isAuthorized = permissionRepository.existsByPermissionGroup_IdAndUserEmailAndPermissionLevel(permissionGroup.getId(), userMail, PermissionLevel.EDIT);
-        if (!isAuthorized) {
-            throw new ForbiddenException("Not authorized to access this resource");
-        }
-        File file = new File();
-        file.setName(fileName);
-        file.setParent(folder);
-        file.setPermissionGroup(permissionGroup);
-        fileRepository.save(file);
-        FileData fileData = new FileData();
-        fileData.setBinaryData(bytes);
-        fileData.setItem(file);
+        File file = saveFile(folderId, fileName, userMail);
+        saveFileMetaData(bytes, file);
+        return file;
+    }
+
+    private void saveFileMetaData(byte[] bytes, File file) {
+        FileData fileData = FileDataBuilder.constructFileData(bytes, file);
         fileDataRepository.save(fileData);
+    }
+
+    private File saveFile(Long folderId, String fileName, String userMail) {
+        Folder folder = folderRepository.findById(folderId)
+                .orElseThrow(itemNotFoundException(folderId));
+        PermissionGroup permissionGroup = folder.getPermissionGroup();
+        permissionValidator.validateUserIsAuthorizedToAccessItem(userMail, permissionGroup, List.of(PermissionLevel.EDIT));
+        File file = FileBuilder.constructFile(fileName, folder, permissionGroup);
+        fileRepository.save(file);
         return file;
     }
 
     public File createFileToSpace(Long spaceId, String fileName, byte[] bytes, String userMail) {
-        Space space = spaceRepository.findById(spaceId).orElseThrow();
+        Space space = spaceRepository.findById(spaceId)
+                .orElseThrow(itemNotFoundException(spaceId));
         PermissionGroup permissionGroup = space.getPermissionGroup();
-        boolean isAuthorized = permissionRepository.existsByPermissionGroup_IdAndUserEmailAndPermissionLevel(permissionGroup.getId(), userMail, PermissionLevel.EDIT);
-        if (!isAuthorized) {
-            throw new ForbiddenException("Not authorized to access this resource");
-        }
-        File file = new File();
-        file.setName(fileName);
-        file.setParent(space);
-        file.setPermissionGroup(permissionGroup);
+        permissionValidator.validateUserIsAuthorizedToAccessItem(userMail, permissionGroup, List.of(PermissionLevel.EDIT, PermissionLevel.VIEW));
+        File file = FileBuilder.constructFile(fileName, space, permissionGroup);
         fileRepository.save(file);
-        FileData fileData = new FileData();
-        fileData.setBinaryData(bytes);
-        fileData.setItem(file);
-        fileDataRepository.save(fileData);
+        saveFileMetaData(bytes, file);
         return file;
     }
 
-    public FileData getFileData(Long fileId, String userMail) throws FileNotFoundException {
-        File file = fileRepository.findById(fileId).orElseThrow();
-        PermissionGroup permissionGroup = file.getPermissionGroup();
-
-        boolean isAuthorized = permissionRepository.existsByPermissionGroup_IdAndUserEmailAndPermissionLevelIn(permissionGroup.getId(), userMail,
-                List.of(PermissionLevel.EDIT, PermissionLevel.VIEW));
-
-        if (!isAuthorized) {
-            throw new ForbiddenException("Not authorized to access this resource");
-        }
+    public FileData getFileData(Long fileId, String userMail) {
+        File file = getFile(fileId, userMail);
         return fileDataRepository.findByItem(file)
-                .orElseThrow(() -> new FileNotFoundException("File not found with ID: " + fileId));
+                .orElseThrow(itemNotFoundException(fileId));
     }
 
-    public File getFile(Long fileId, String userMail) throws FileNotFoundException {
-        File file = fileRepository.findById(fileId).orElseThrow();
+    public File getFile(Long fileId, String userMail) {
+        File file = fileRepository.findById(fileId)
+                .orElseThrow(itemNotFoundException(fileId));
         PermissionGroup permissionGroup = file.getPermissionGroup();
-
-        boolean isAuthorized = permissionRepository.existsByPermissionGroup_IdAndUserEmailAndPermissionLevelIn(permissionGroup.getId(), userMail,
-                List.of(PermissionLevel.EDIT, PermissionLevel.VIEW));
-
-        if (!isAuthorized) {
-            throw new ForbiddenException("Not authorized to access this resource");
-        }
+        permissionValidator.validateUserIsAuthorizedToAccessItem(userMail, permissionGroup, List.of(PermissionLevel.EDIT, PermissionLevel.VIEW));
         return file;
     }
 }

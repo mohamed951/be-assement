@@ -8,7 +8,5 @@ import java.util.Collection;
 
 public interface PermissionRepository extends JpaRepository<Permission, Long> {
 
-    boolean existsByPermissionGroup_IdAndUserEmailAndPermissionLevel(Long groupId, String userEmail, PermissionLevel permissionLevel);
-
     boolean existsByPermissionGroup_IdAndUserEmailAndPermissionLevelIn(Long groupId, String userEmail, Collection<PermissionLevel> permissionLevel);
 }
