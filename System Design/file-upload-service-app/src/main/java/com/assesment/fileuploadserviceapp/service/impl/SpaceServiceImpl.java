@@ -7,6 +7,7 @@ import com.assesment.fileuploadserviceapp.repositories.PermissionGroupRepository
 import com.assesment.fileuploadserviceapp.repositories.SpaceRepository;
 import com.assesment.fileuploadserviceapp.service.SpaceService;
 import com.assesment.fileuploadserviceapp.util.SpaceBuilder;
+import com.assesment.fileuploadserviceapp.validation.ItemValidator;
 import com.assesment.fileuploadserviceapp.validation.PermissionValidator;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -25,8 +26,12 @@ public class SpaceServiceImpl implements SpaceService {
 
     private PermissionValidator permissionValidator;
 
+    private ItemValidator itemValidator;
+
+
     @Override
     public Space createSpace(String spaceName, String userMail) {
+        itemValidator.validateSpace(spaceName);
         PermissionGroup permissionGroup = getDefaultPermissionGroup();
         Space space = SpaceBuilder.constructSpace(spaceName, permissionGroup);
         permissionValidator.validateUserIsAuthorizedToAccessItem(userMail, permissionGroup, List.of(PermissionLevel.EDIT));
